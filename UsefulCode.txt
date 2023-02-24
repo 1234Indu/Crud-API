@@ -1,0 +1,25 @@
+//Query or code for searching records in database which is having both values (comma separated) entered by use and stored in different rows in database but not the record which has only one value not all values entered by user.  
+
+    public function get_choose_staff_data($services) {
+        $builder = $this->db->table('employee_sub_service_tbl as es');
+        $builder = $builder->select("es.emp_id,et.emp_first_name,et.emp_last_name,et.emp_img,et.emp_title");
+        $builder = $builder->join('employee_tbl as et', 'es.emp_id = et.emp_id');
+            
+        $whr = "1";
+        $c = 1;
+        foreach ($services as $s) {
+            $whr .= " AND `es$c`.`sub_service_id`=$s";
+            $builder = $builder->join("employee_sub_service_tbl as es$c", "es$c.emp_id = et.emp_id");
+            $c++;
+        }
+        $builder = $builder->where($whr);
+        $builder = $builder->groupBy('et.emp_id');
+        return $query  = $builder->get()->getResultArray();
+    }
+
+    SELECT `es`.`emp_id`, `et`.`emp_first_name`, `et`.`emp_last_name`, `et`.`emp_img`, `et`.`emp_title`
+FROM `employee_sub_service_tbl` as `es`
+JOIN `employee_tbl` as `et` ON `es`.`emp_id` = `et`.`emp_id`
+JOIN `employee_sub_service_tbl` as `es1` ON `es1`.`emp_id` = `et`.`emp_id`
+JOIN `employee_sub_service_tbl` as `es2` ON `es2`.`emp_id` = `et`.`emp_id`
+WHERE `es`.`sub_service_id` = '8' AND `es1`.`sub_service_id` = '5' AND `es2`.`sub_service_id` = '9'
